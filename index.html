@@ -258,8 +258,7 @@
   import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
   import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-  // Catálogo optimizado: camTargetOffset con Y positivo empuja el foco arriba, 
-  // haciendo que la máquina baje y se centre perfectamente en el espacio libre superior.
+  // Catálogo con zoom (camPos) y centrado (camTargetOffset) totalmente personalizados por punto
   const PARTS_DATA = [
     {
       id: 1,
@@ -270,8 +269,8 @@
       func: "Sostiene el plato y lo hace girar con la pieza.",
       warn: "Zona de piezas giratorias: no tocar con la máquina en marcha.",
       animClip: "Operation_Basic",
-      camPos: new THREE.Vector3(-1.6, 2.1, 2.0),
-      camTargetOffset: new THREE.Vector3(0, -0.28, 0)
+      camPos: new THREE.Vector3(-2.2, 2.6, 2.8), // Zoom más alejado para ver completo el punto 1
+      camTargetOffset: new THREE.Vector3(0, -0.10, 0)
     },
     {
       id: 2,
@@ -282,8 +281,8 @@
       func: "Sujeta la pieza (material base) que se va a trabajar.",
       warn: "Verificar que la pieza quede bien sujeta antes de encender.",
       animClip: "Idle_Chuck",
-      camPos: new THREE.Vector3(-0.35, 1.75, 1.5),
-      camTargetOffset: new THREE.Vector3(0, -0.22, 0)
+      camPos: new THREE.Vector3(-0.45, 1.9, 1.7),
+      camTargetOffset: new THREE.Vector3(0, -0.18, 0)
     },
     {
       id: 3,
@@ -294,7 +293,7 @@
       func: "Sobre ella se deslizan los carros y el contrapunto.",
       warn: "Mantener las guías limpias de viruta y libres de herramientas.",
       animClip: "Carriage_Move",
-      camPos: new THREE.Vector3(0.0, 1.8, 2.3),
+      camPos: new THREE.Vector3(0.0, 1.9, 2.6),
       camTargetOffset: new THREE.Vector3(0, -0.15, 0)
     },
     {
@@ -306,8 +305,8 @@
       func: "Acerca o aleja la herramienta de la pieza.",
       warn: "Verificar el espacio libre antes de accionar el avance transversal.",
       animClip: "CrossSlide_Move",
-      camPos: new THREE.Vector3(0.35, 1.7, 1.5),
-      camTargetOffset: new THREE.Vector3(0, -0.25, 0)
+      camPos: new THREE.Vector3(0.38, 1.85, 1.6),
+      camTargetOffset: new THREE.Vector3(0, -0.22, 0)
     },
     {
       id: 5,
@@ -318,8 +317,8 @@
       func: "Mueve la cuchilla para dar la forma deseada a la pieza.",
       warn: "Asegurar firmemente los tornillos de ajuste angular del charriot.",
       animClip: "Operation_Basic",
-      camPos: new THREE.Vector3(0.28, 1.75, 1.35),
-      camTargetOffset: new THREE.Vector3(0, -0.28, 0)
+      camPos: new THREE.Vector3(0.32, 1.9, 1.4),
+      camTargetOffset: new THREE.Vector3(0, -0.25, 0)
     },
     {
       id: 6,
@@ -330,8 +329,8 @@
       func: "Tornillo que mueve el carro transversal con precisión milimétrica.",
       warn: "No forzar el volante al llegar a los topes de su recorrido.",
       animClip: "CrossSlide_Move",
-      camPos: new THREE.Vector3(0.32, 1.55, 1.4),
-      camTargetOffset: new THREE.Vector3(0, -0.24, 0)
+      camPos: new THREE.Vector3(0.38, 1.75, 1.55), // Zoom y posición ajustada para que no quede tan arriba
+      camTargetOffset: new THREE.Vector3(0, -0.18, 0)
     },
     {
       id: 7,
@@ -342,8 +341,8 @@
       func: "Sostiene la herramienta de corte.",
       warn: "Retirar la llave antes de encender.",
       animClip: "Operation_Basic",
-      camPos: new THREE.Vector3(0.22, 1.75, 1.25),
-      camTargetOffset: new THREE.Vector3(0, -0.30, 0)
+      camPos: new THREE.Vector3(0.28, 1.95, 1.35), // Ajustado para bajar la torreta al centro exacto
+      camTargetOffset: new THREE.Vector3(0, -0.25, 0)
     },
     {
       id: 8,
@@ -504,7 +503,6 @@
         box.getCenter(center);
       }
       
-      // Aplicar correctamente el offset invertido para centrar la pieza en el visor superior
       const finalTarget = center.clone().add(part.camTargetOffset);
       const finalPos = part.camPos.clone().add(part.camTargetOffset);
 
