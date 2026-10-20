@@ -480,7 +480,7 @@
       const isSelected = idx === currentPartIndex;
       item.pin.classList.toggle('active', isSelected);
       item.dot.classList.toggle('active', isSelected);
-      
+
       if (isSelected) {
         item.line.setAttribute('stroke', '#f97316');
         item.line.setAttribute('stroke-width', '2.8');
@@ -502,7 +502,7 @@
         const box = new THREE.Box3().setFromObject(node);
         box.getCenter(center);
       }
-      
+
       const finalTarget = center.clone().add(part.camTargetOffset);
       const finalPos = part.camPos.clone().add(part.camTargetOffset);
 
@@ -663,7 +663,7 @@
       const marginX = 28;
       const usableW = width - marginX * 2;
       const ratio = idx / Math.max(1, totalPins - 1);
-      
+
       const px = marginX + ratio * usableW;
       const py = 110 + (idx % 2) * 26;
 
