@@ -1,0 +1,711 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no" />
+  <title>Visor 3D - Torno de Precisión Pinacho</title>
+  <style>
+    :root {
+      --primary: #0f4c81;
+      --accent: #f97316;
+      --bg-grad-top: #e8eef3;
+      --bg-grad-bot: #cfd8e3;
+      --card-bg: rgba(255, 255, 255, 0.96);
+      --text-main: #1e293b;
+      --text-muted: #475569;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+    body {
+      font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
+      background: #0f172a;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      min-height: 100vh;
+    }
+
+    /* Contenedor Vertical (9:16 móvil) */
+    #app-container {
+      position: relative;
+      width: 100%;
+      max-width: 440px;
+      height: 100vh;
+      max-height: 860px;
+      background: linear-gradient(180deg, var(--bg-grad-top) 0%, var(--bg-grad-bot) 100%);
+      overflow: hidden;
+      display: flex;
+      flex-direction: column;
+      box-shadow: 0 20px 50px rgba(0,0,0,0.5);
+    }
+
+    @media (min-width: 480px) {
+      #app-container { height: 92vh; border-radius: 28px; border: 6px solid #334155; }
+    }
+
+    #app-container:fullscreen, #app-container:-webkit-full-screen {
+      max-width: 100%; max-height: 100%; width: 100vw; height: 100vh; border-radius: 0; border: none;
+    }
+
+    /* Cabecera unificada superior */
+    .header {
+      position: absolute; top: 0; left: 0; right: 0;
+      padding: 14px 16px;
+      display: flex; justify-content: space-between; align-items: center;
+      z-index: 20; pointer-events: none;
+    }
+    .header-left, .header-right {
+      display: flex; gap: 6px; align-items: center; pointer-events: auto;
+    }
+
+    .icon-btn {
+      width: 38px; height: 38px; border-radius: 10px; border: 1px solid rgba(0,0,0,0.08);
+      background: rgba(255,255,255,0.92); backdrop-filter: blur(6px);
+      display: flex; justify-content: center; align-items: center;
+      cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: all 0.2s; color: var(--text-main); font-weight: 700; font-size: 0.78rem;
+    }
+    .icon-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+    .icon-btn:active { transform: scale(0.94); }
+
+    .pill-btn {
+      padding: 8px 12px; border-radius: 20px; border: 1px solid rgba(0,0,0,0.08);
+      background: rgba(255,255,255,0.92); backdrop-filter: blur(6px);
+      font-size: 0.74rem; font-weight: 700;
+      color: var(--text-main); cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: all 0.2s; display: flex; align-items: center; gap: 4px;
+    }
+    .pill-btn:hover { background: #fff; }
+    .pill-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
+
+    /* Lienzo 3D y Capa de Líneas Guía */
+    #viewport { position: relative; flex: 1; width: 100%; height: 100%; overflow: hidden; }
+    canvas { width: 100% !important; height: 100% !important; display: block; outline: none; }
+
+    #callout-svg {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 10;
+    }
+    #pins-layer {
+      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
+      pointer-events: none; z-index: 12;
+    }
+
+    /* Pines Numerados */
+    .pin {
+      position: absolute; width: 30px; height: 30px; margin-left: -15px; margin-top: -15px;
+      border-radius: 50%; background: #ffffff; color: var(--text-main);
+      font-weight: 700; font-size: 0.82rem;
+      display: flex; justify-content: center; align-items: center;
+      box-shadow: 0 3px 10px rgba(0,0,0,0.22);
+      border: 2px solid #cbd5e1;
+      cursor: pointer; pointer-events: auto;
+      transition: transform 0.2s, background 0.2s, color 0.2s, border-color 0.2s;
+    }
+    .pin:hover { transform: scale(1.1); }
+    .pin.active {
+      background: var(--accent); color: #fff; border-color: #fff;
+      transform: scale(1.22);
+      box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.35), 0 4px 12px rgba(0,0,0,0.3);
+      z-index: 15;
+    }
+
+    /* Punto de anclaje sobre la máquina */
+    .anchor-dot {
+      position: absolute; width: 9px; height: 9px; margin-left: -4.5px; margin-top: -4.5px;
+      border-radius: 50%; background: var(--primary); border: 2px solid #fff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.4); pointer-events: none;
+    }
+    .anchor-dot.active { background: var(--accent); transform: scale(1.3); }
+
+    /* Tarjeta Inferior (Bottom Sheet) */
+    .bottom-area {
+      position: absolute; bottom: 0; left: 0; right: 0;
+      padding: 10px 16px 16px;
+      display: flex; flex-direction: column; gap: 8px;
+      z-index: 25; pointer-events: none;
+    }
+    .info-card {
+      background: var(--card-bg); backdrop-filter: blur(12px);
+      border-radius: 16px; padding: 14px 16px;
+      box-shadow: 0 8px 30px rgba(0,0,0,0.16);
+      border: 1px solid rgba(255,255,255,0.8);
+      pointer-events: auto;
+    }
+    .info-card h2 {
+      font-size: 1.05rem; color: var(--primary); margin-bottom: 8px; font-weight: 800;
+    }
+    .info-row { font-size: 0.81rem; color: var(--text-main); margin-bottom: 5px; line-height: 1.3; }
+    .info-row strong { font-weight: 700; color: #0f172a; font-size: 0.72rem; display: block; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 1px; color: var(--text-muted); }
+    .info-row span { font-size: 0.84rem; color: var(--text-main); font-weight: 500; }
+    .card-footer {
+      display: flex; justify-content: space-between; align-items: center;
+      margin-top: 8px; padding-top: 8px; border-top: 1px solid #e2e8f0; gap: 8px;
+    }
+    .warning-text {
+      font-size: 0.74rem; color: #b45309; background: #fef3c7;
+      padding: 6px 10px; border-radius: 8px; flex: 1; line-height: 1.25;
+      border-left: 3px solid #f59e0b;
+    }
+    .anim-btn {
+      background: var(--accent); color: white; border: none;
+      padding: 9px 15px; border-radius: 18px; font-weight: 700;
+      font-size: 0.76rem; letter-spacing: 0.5px; cursor: pointer;
+      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
+      transition: all 0.2s; white-space: nowrap;
+    }
+    .anim-btn.playing { background: #dc2626; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4); }
+    .anim-btn:active { transform: scale(0.95); }
+
+    /* Paginación < 1 / 10 > */
+    .stepper {
+      align-self: center; display: flex; align-items: center;
+      background: rgba(255,255,255,0.95); border-radius: 12px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.12); overflow: hidden;
+      pointer-events: auto; border: 1px solid rgba(0,0,0,0.06);
+    }
+    .stepper button {
+      background: transparent; border: none; width: 42px; height: 34px;
+      font-size: 1rem; font-weight: bold; color: var(--text-main);
+      cursor: pointer; transition: background 0.15s;
+    }
+    .stepper button:hover { background: #f1f5f9; }
+    .stepper span {
+      padding: 0 14px; font-size: 0.85rem; font-weight: 700; color: var(--text-main);
+      border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0;
+    }
+
+    /* Pantalla de Carga Inicial */
+    #loading-screen {
+      position: absolute; inset: 0; background: rgba(15, 23, 42, 0.92);
+      backdrop-filter: blur(8px); z-index: 50;
+      display: flex; flex-direction: column; justify-content: center; align-items: center;
+      color: white; text-align: center; padding: 30px;
+      transition: opacity 0.4s ease;
+    }
+    #loading-screen.hidden { opacity: 0; pointer-events: none; }
+    .loader-spinner {
+      width: 48px; height: 48px; border: 4px solid rgba(255,255,255,0.2);
+      border-top-color: var(--accent); border-radius: 50%;
+      animation: spin 0.9s linear infinite; margin-bottom: 16px;
+    }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .loader-text { font-size: 0.92rem; font-weight: 600; color: #cbd5e1; }
+  </style>
+
+  <script type="importmap">
+    {
+      "imports": {
+        "three": "https://unpkg.com/three@0.160.0/build/three.module.js",
+        "three/addons/": "https://unpkg.com/three@0.160.0/examples/jsm/"
+      }
+    }
+  </script>
+</head>
+<body>
+
+<div id="app-container">
+  <div id="loading-screen">
+    <div class="loader-spinner"></div>
+    <div class="loader-text">Cargando Torno 3D Interactivo...</div>
+  </div>
+
+  <div class="header">
+    <div class="header-left">
+      <button class="pill-btn" id="btn-explode">💥 Explosionar</button>
+      <button class="pill-btn" id="btn-toggle-pins">👁️ Pines</button>
+    </div>
+    <div class="header-right">
+      <button class="icon-btn" id="btn-reset-cam" title="Centrar vista 3D">3D</button>
+      <button class="icon-btn" id="btn-fullscreen" title="Pantalla completa">⛶</button>
+    </div>
+  </div>
+
+  <div id="viewport">
+    <svg id="callout-svg"></svg>
+    <div id="pins-layer"></div>
+  </div>
+
+  <div class="bottom-area">
+    <div class="info-card" id="info-card">
+      <h2 id="part-title">1. Cabezal y eje principal</h2>
+      <div class="info-row">
+        <strong>Ubicación en la máquina</strong>
+        <span id="part-loc">Extremo izquierdo de la máquina</span>
+      </div>
+      <div class="info-row">
+        <strong>Para qué sirve</strong>
+        <span id="part-func">Sostiene el plato y lo hace girar con la pieza.</span>
+      </div>
+      <div class="card-footer">
+        <div class="warning-text" id="part-warn">
+          <strong>Cuidado preventivo:</strong> Zona de piezas giratorias: no tocar con la máquina en marcha.
+        </div>
+        <button class="anim-btn" id="btn-anim">ANIMAR</button>
+      </div>
+    </div>
+
+    <div class="stepper">
+      <button id="btn-prev">❮</button>
+      <span id="step-counter">1 / 10</span>
+      <button id="btn-next">❯</button>
+    </div>
+  </div>
+</div>
+
+<script type="module">
+  import * as THREE from 'three';
+  import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
+  import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
+
+  // Catálogo con zoom (camPos) y centrado (camTargetOffset) totalmente personalizados por punto
+  const PARTS_DATA = [
+    {
+      id: 1,
+      name: "Cabezal y eje principal",
+      nodeName: "Headstock_Group",
+      anchor3D: new THREE.Vector3(-1.15, 1.55, 0.20),
+      loc: "Extremo izquierdo de la máquina",
+      func: "Sostiene el plato y lo hace girar con la pieza.",
+      warn: "Zona de piezas giratorias: no tocar con la máquina en marcha.",
+      animClip: "Operation_Basic",
+      camPos: new THREE.Vector3(-2.2, 2.6, 2.8), // Zoom más alejado para ver completo el punto 1
+      camTargetOffset: new THREE.Vector3(0, -0.10, 0)
+    },
+    {
+      id: 2,
+      name: "Plato (mandril)",
+      nodeName: "Chuck",
+      anchor3D: new THREE.Vector3(-0.56, 1.43, 0.14),
+      loc: "Al frente del cabezal",
+      func: "Sujeta la pieza (material base) que se va a trabajar.",
+      warn: "Verificar que la pieza quede bien sujeta antes de encender.",
+      animClip: "Idle_Chuck",
+      camPos: new THREE.Vector3(-0.45, 1.9, 1.7),
+      camTargetOffset: new THREE.Vector3(0, -0.18, 0)
+    },
+    {
+      id: 3,
+      name: "Bancada",
+      nodeName: "Bed_Ways",
+      anchor3D: new THREE.Vector3(-0.30, 1.06, 0.15),
+      loc: "Base larga de la máquina",
+      func: "Sobre ella se deslizan los carros y el contrapunto.",
+      warn: "Mantener las guías limpias de viruta y libres de herramientas.",
+      animClip: "Carriage_Move",
+      camPos: new THREE.Vector3(0.0, 1.9, 2.6),
+      camTargetOffset: new THREE.Vector3(0, -0.15, 0)
+    },
+    {
+      id: 4,
+      name: "Carro transversal",
+      nodeName: "CrossSlide_Group",
+      anchor3D: new THREE.Vector3(0.12, 1.22, 0.18),
+      loc: "Sobre la bancada, al frente",
+      func: "Acerca o aleja la herramienta de la pieza.",
+      warn: "Verificar el espacio libre antes de accionar el avance transversal.",
+      animClip: "CrossSlide_Move",
+      camPos: new THREE.Vector3(0.38, 1.85, 1.6),
+      camTargetOffset: new THREE.Vector3(0, -0.22, 0)
+    },
+    {
+      id: 5,
+      name: "Charriot (carro superior o auxiliar)",
+      nodeName: "Compound_Group",
+      anchor3D: new THREE.Vector3(0.12, 1.35, -0.02),
+      loc: "Sobre el carro transversal",
+      func: "Mueve la cuchilla para dar la forma deseada a la pieza.",
+      warn: "Asegurar firmemente los tornillos de ajuste angular del charriot.",
+      animClip: "Operation_Basic",
+      camPos: new THREE.Vector3(0.32, 1.9, 1.4),
+      camTargetOffset: new THREE.Vector3(0, -0.25, 0)
+    },
+    {
+      id: 6,
+      name: "Husillo transversal",
+      nodeName: "CrossSlide_Handwheel",
+      anchor3D: new THREE.Vector3(0.12, 1.21, 0.44),
+      loc: "Volante del carro transversal",
+      func: "Tornillo que mueve el carro transversal con precisión milimétrica.",
+      warn: "No forzar el volante al llegar a los topes de su recorrido.",
+      animClip: "CrossSlide_Move",
+      camPos: new THREE.Vector3(0.38, 1.75, 1.55), // Zoom y posición ajustada para que no quede tan arriba
+      camTargetOffset: new THREE.Vector3(0, -0.18, 0)
+    },
+    {
+      id: 7,
+      name: "Torreta portaherramientas y su llave",
+      nodeName: "Toolpost_Group",
+      anchor3D: new THREE.Vector3(0.105, 1.52, 0.0),
+      loc: "Sobre el charriot",
+      func: "Sostiene la herramienta de corte.",
+      warn: "Retirar la llave antes de encender.",
+      animClip: "Operation_Basic",
+      camPos: new THREE.Vector3(0.28, 1.95, 1.35), // Ajustado para bajar la torreta al centro exacto
+      camTargetOffset: new THREE.Vector3(0, -0.25, 0)
+    },
+    {
+      id: 8,
+      name: "Delantal",
+      nodeName: "Carriage_Group",
+      anchor3D: new THREE.Vector3(0.12, 0.88, 0.45),
+      loc: "Bajo el carro principal, al frente",
+      func: "Caja con los mandos de avance y roscado. Tiene un dispositivo que impide usar ambos a la vez.",
+      warn: "No intentar engranar avances simultáneos opuestos.",
+      animClip: "Carriage_Move",
+      camPos: new THREE.Vector3(0.2, 1.4, 1.7),
+      camTargetOffset: new THREE.Vector3(0, -0.15, 0)
+    },
+    {
+      id: 9,
+      name: "Caja de avances y lira",
+      nodeName: "Front_Rods_Group",
+      anchor3D: new THREE.Vector3(-0.75, 0.91, 0.36),
+      loc: "Debajo del cabezal, a la izquierda",
+      func: "Permiten elegir distintos avances y pasos de rosca sin cambiar engranes a cada rato.",
+      warn: "Cambiar velocidades de avance únicamente con la máquina completamente detenida.",
+      animClip: "Handwheels_Rotate",
+      camPos: new THREE.Vector3(-0.5, 1.45, 1.8),
+      camTargetOffset: new THREE.Vector3(0, -0.18, 0)
+    },
+    {
+      id: 10,
+      name: "Contrapunto",
+      nodeName: "Tailstock_Group",
+      anchor3D: new THREE.Vector3(1.16, 1.42, 0.05),
+      loc: "Extremo derecho de la máquina",
+      func: "Apoya el otro extremo de piezas largas o pesadas.",
+      warn: "Bloquear firmemente la palanca de sujeción a la bancada antes de iniciar el mecanizado.",
+      animClip: "Tailstock_Move",
+      camPos: new THREE.Vector3(1.45, 1.8, 1.7),
+      camTargetOffset: new THREE.Vector3(0, -0.22, 0)
+    }
+  ];
+
+  const viewport = document.getElementById('viewport');
+  const svgLayer = document.getElementById('callout-svg');
+  const pinsLayer = document.getElementById('pins-layer');
+
+  const scene = new THREE.Scene();
+  const camera = new THREE.PerspectiveCamera(42, viewport.clientWidth / viewport.clientHeight, 0.1, 50);
+
+  const DEFAULT_CAM_POS = new THREE.Vector3(2.3, 2.35, 3.6);
+  const DEFAULT_CAM_TARGET = new THREE.Vector3(0.0, 0.95, 0.0);
+  camera.position.copy(DEFAULT_CAM_POS);
+
+  const renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true });
+  renderer.setPixelRatio(Math.min(window.devicePixelRatio, 2));
+  renderer.setSize(viewport.clientWidth, viewport.clientHeight);
+  renderer.toneMapping = THREE.ACESFilmicToneMapping;
+  renderer.toneMappingExposure = 1.15;
+  viewport.appendChild(renderer.domElement);
+
+  const controls = new OrbitControls(camera, renderer.domElement);
+  controls.target.copy(DEFAULT_CAM_TARGET);
+  controls.enableDamping = true;
+  controls.dampingFactor = 0.06;
+  controls.maxPolarAngle = Math.PI / 2 + 0.08;
+  controls.minDistance = 1.0;
+  controls.maxDistance = 8.0;
+
+  scene.add(new THREE.HemisphereLight(0xffffff, 0x94a3b8, 1.6));
+  const dirLight1 = new THREE.DirectionalLight(0xffffff, 2.2);
+  dirLight1.position.set(4, 6, 5);
+  scene.add(dirLight1);
+
+  const dirLight2 = new THREE.DirectionalLight(0xdbeafe, 1.2);
+  dirLight2.position.set(-4, 3, -3);
+  scene.add(dirLight2);
+
+  let latheRoot = null;
+  let mixer = null;
+  let animationsMap = {};
+  let currentAction = null;
+  let currentPartIndex = 0;
+  let isExploded = false;
+  let pinsVisible = true;
+  let camAnim = null;
+
+  const pinElements = [];
+  PARTS_DATA.forEach((part, idx) => {
+    const pin = document.createElement('div');
+    pin.className = 'pin';
+    pin.textContent = part.id;
+    pin.addEventListener('click', (e) => {
+      e.stopPropagation();
+      selectPart(idx, true);
+    });
+    pinsLayer.appendChild(pin);
+
+    const dot = document.createElement('div');
+    dot.className = 'anchor-dot';
+    pinsLayer.appendChild(dot);
+
+    const line = document.createElementNS('http://www.w3.org/2000/svg', 'line');
+    svgLayer.appendChild(line);
+
+    pinElements.push({ pin, dot, line, part });
+  });
+
+  const originalMaterials = new Map();
+
+  function highlightNode(targetNodeName) {
+    if (!latheRoot) return;
+    originalMaterials.forEach((mat, mesh) => { mesh.material = mat; });
+
+    const targetNode = latheRoot.getObjectByName(targetNodeName);
+    if (!targetNode) return;
+
+    targetNode.traverse((child) => {
+      if (child.isMesh) {
+        const clonedMat = child.material.clone();
+        clonedMat.emissive = new THREE.Color(0xf97316);
+        clonedMat.emissiveIntensity = 0.38;
+        child.material = clonedMat;
+      }
+    });
+  }
+
+  function selectPart(index, flyCamera = true) {
+    currentPartIndex = (index + PARTS_DATA.length) % PARTS_DATA.length;
+    const part = PARTS_DATA[currentPartIndex];
+
+    document.getElementById('part-title').textContent = `${part.id}. ${part.name}`;
+    document.getElementById('part-loc').textContent = part.loc;
+    document.getElementById('part-func').textContent = part.func;
+    document.getElementById('part-warn').innerHTML = `<strong>Cuidado preventivo:</strong> ${part.warn}`;
+    document.getElementById('step-counter').textContent = `${part.id} / ${PARTS_DATA.length}`;
+
+    pinElements.forEach((item, idx) => {
+      const isSelected = idx === currentPartIndex;
+      item.pin.classList.toggle('active', isSelected);
+      item.dot.classList.toggle('active', isSelected);
+
+      if (isSelected) {
+        item.line.setAttribute('stroke', '#f97316');
+        item.line.setAttribute('stroke-width', '2.8');
+        item.line.removeAttribute('stroke-dasharray');
+      } else {
+        item.line.setAttribute('stroke', '#94a3b8');
+        item.line.setAttribute('stroke-width', '1.4');
+        item.line.setAttribute('stroke-dasharray', '4, 4');
+      }
+    });
+
+    highlightNode(part.nodeName);
+    stopCurrentAnimation();
+
+    if (flyCamera && !isExploded) {
+      const node = latheRoot.getObjectByName(part.nodeName);
+      let center = part.anchor3D.clone();
+      if (node) {
+        const box = new THREE.Box3().setFromObject(node);
+        box.getCenter(center);
+      }
+
+      const finalTarget = center.clone().add(part.camTargetOffset);
+      const finalPos = part.camPos.clone().add(part.camTargetOffset);
+
+      animateCameraTo(finalPos, finalTarget);
+    }
+  }
+
+  function animateCameraTo(targetPos, targetLook) {
+    camAnim = {
+      startPos: camera.position.clone(),
+      endPos: targetPos.clone(),
+      startLook: controls.target.clone(),
+      endLook: targetLook.clone(),
+      progress: 0
+    };
+  }
+
+  const btnAnim = document.getElementById('btn-anim');
+  function stopCurrentAnimation() {
+    if (currentAction) {
+      currentAction.fadeOut(0.25);
+      currentAction = null;
+    }
+    btnAnim.textContent = 'ANIMAR';
+    btnAnim.classList.remove('playing');
+  }
+
+  btnAnim.addEventListener('click', () => {
+    if (!mixer) return;
+    const part = PARTS_DATA[currentPartIndex];
+    const clip = animationsMap[part.animClip];
+    if (!clip) return;
+
+    if (currentAction) {
+      stopCurrentAnimation();
+      return;
+    }
+
+    if (isExploded) toggleExplodedView(false);
+
+    const action = mixer.clipAction(clip);
+    action.reset();
+    action.setLoop(THREE.LoopRepeat, Infinity);
+    action.fadeIn(0.25).play();
+    currentAction = action;
+
+    btnAnim.textContent = 'DETENER';
+    btnAnim.classList.add('playing');
+  });
+
+  const btnExplode = document.getElementById('btn-explode');
+  function toggleExplodedView(forceState) {
+    if (!mixer) return;
+    isExploded = forceState !== undefined ? forceState : !isExploded;
+    btnExplode.classList.toggle('active', isExploded);
+
+    stopCurrentAnimation();
+    mixer.stopAllAction();
+
+    const clipName = isExploded ? 'Exploded_View' : 'Exploded_Reset';
+    const clip = animationsMap[clipName];
+    if (clip) {
+      const action = mixer.clipAction(clip);
+      action.reset();
+      action.setLoop(THREE.LoopOnce, 1);
+      action.clampWhenFinished = true;
+      action.play();
+    }
+
+    if (isExploded) {
+      animateCameraTo(new THREE.Vector3(2.5, 2.6, 3.9), new THREE.Vector3(0, 1.15, 0));
+    } else {
+      animateCameraTo(DEFAULT_CAM_POS, DEFAULT_CAM_TARGET);
+    }
+  }
+  btnExplode.addEventListener('click', () => toggleExplodedView());
+
+  const btnTogglePins = document.getElementById('btn-toggle-pins');
+  btnTogglePins.addEventListener('click', () => {
+    pinsVisible = !pinsVisible;
+    pinsLayer.style.display = pinsVisible ? 'block' : 'none';
+    svgLayer.style.display = pinsVisible ? 'block' : 'none';
+    btnTogglePins.classList.toggle('active', !pinsVisible);
+  });
+
+  document.getElementById('btn-reset-cam').addEventListener('click', () => {
+    animateCameraTo(DEFAULT_CAM_POS, DEFAULT_CAM_TARGET);
+  });
+
+  const appContainer = document.getElementById('app-container');
+  document.getElementById('btn-fullscreen').addEventListener('click', () => {
+    if (!document.fullscreenElement) {
+      appContainer.requestFullscreen?.() || appContainer.webkitRequestFullscreen?.();
+    } else {
+      document.exitFullscreen?.() || document.webkitExitFullscreen?.();
+    }
+  });
+
+  document.getElementById('btn-prev').addEventListener('click', () => selectPart(currentPartIndex - 1, true));
+  document.getElementById('btn-next').addEventListener('click', () => selectPart(currentPartIndex + 1, true));
+
+  const loader = new GLTFLoader();
+  const loadingScreen = document.getElementById('loading-screen');
+
+  const MODEL_URL = 'https://raw.githubusercontent.com/alexcau-source/T-Vilab/a59cc70556053c919f81e3b5635878bffc0db9cc/torno_tvilab_animado.glb';
+
+  loader.load(
+    MODEL_URL,
+    (gltf) => {
+      latheRoot = gltf.scene;
+      scene.add(latheRoot);
+
+      originalMaterials.clear();
+      latheRoot.traverse((child) => {
+        if (child.isMesh) originalMaterials.set(child, child.material);
+      });
+
+      mixer = new THREE.AnimationMixer(latheRoot);
+      animationsMap = {};
+      gltf.animations.forEach((clip) => { animationsMap[clip.name] = clip; });
+
+      loadingScreen.classList.add('hidden');
+      selectPart(0, false);
+    },
+    (xhr) => {
+      if (xhr.lengthComputable) {
+        const percent = Math.round((xhr.loaded / xhr.total) * 100);
+        document.querySelector('.loader-text').textContent = `Cargando Torno 3D... ${percent}%`;
+      }
+    },
+    (error) => {
+      console.error('Error al cargar el modelo 3D:', error);
+      document.querySelector('.loader-text').textContent = 'Error al cargar el modelo desde GitHub.';
+    }
+  );
+
+  function updateCallouts() {
+    if (!latheRoot || !pinsVisible) return;
+    const width = viewport.clientWidth;
+    const height = viewport.clientHeight;
+    const totalPins = pinElements.length;
+
+    pinElements.forEach((item, idx) => {
+      const worldPos = item.part.anchor3D.clone();
+      const node = latheRoot.getObjectByName(item.part.nodeName);
+      if (node) {
+        const box = new THREE.Box3().setFromObject(node);
+        box.getCenter(worldPos);
+      }
+
+      const projected = worldPos.clone().project(camera);
+      const ax = (projected.x * 0.5 + 0.5) * width;
+      const ay = (-(projected.y * 0.5) + 0.5) * height;
+
+      item.dot.style.left = `${ax}px`;
+      item.dot.style.top = `${ay}px`;
+
+      const marginX = 28;
+      const usableW = width - marginX * 2;
+      const ratio = idx / Math.max(1, totalPins - 1);
+
+      const px = marginX + ratio * usableW;
+      const py = 110 + (idx % 2) * 26;
+
+      item.pin.style.left = `${px}px`;
+      item.pin.style.top = `${py}px`;
+
+      item.line.setAttribute('x1', ax);
+      item.line.setAttribute('y1', ay);
+      item.line.setAttribute('x2', px);
+      item.line.setAttribute('y2', py);
+    });
+  }
+
+  const clock = new THREE.Clock();
+  function animate() {
+    requestAnimationFrame(animate);
+    const delta = clock.getDelta();
+
+    if (mixer) mixer.update(delta);
+
+    if (camAnim) {
+      camAnim.progress += delta * 2.2;
+      const t = Math.min(1, camAnim.progress);
+      const ease = 1 - Math.pow(1 - t, 3);
+      camera.position.lerpVectors(camAnim.startPos, camAnim.endPos, ease);
+      controls.target.lerpVectors(camAnim.startLook, camAnim.endLook, ease);
+      if (t >= 1) camAnim = null;
+    }
+
+    controls.update();
+    renderer.render(scene, camera);
+    updateCallouts();
+  }
+  animate();
+
+  window.addEventListener('resize', () => {
+    const w = viewport.clientWidth;
+    const h = viewport.clientHeight;
+    camera.aspect = w / h;
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+  });
+</script>
+</body>
+</html>
