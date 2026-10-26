@@ -16,6 +16,7 @@
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
+
     body {
       font-family: 'Segoe UI', system-ui, -apple-system, sans-serif;
       background: #0f172a;
@@ -25,7 +26,7 @@
       min-height: 100vh;
     }
 
-    /* Contenedor Vertical (9:16 móvil) */
+    /* Contenedor vertical */
     #app-container {
       position: relative;
       width: 100%;
@@ -40,168 +41,407 @@
     }
 
     @media (min-width: 480px) {
-      #app-container { height: 92vh; border-radius: 28px; border: 6px solid #334155; }
+      #app-container {
+        height: 92vh;
+        border-radius: 28px;
+        border: 6px solid #334155;
+      }
     }
 
     #app-container:fullscreen, #app-container:-webkit-full-screen {
-      max-width: 100%; max-height: 100%; width: 100vw; height: 100vh; border-radius: 0; border: none;
+      max-width: 100%;
+      max-height: 100%;
+      width: 100vw;
+      height: 100vh;
+      border-radius: 0;
+      border: none;
     }
 
-    /* Cabecera unificada superior */
+    /* Cabecera superior */
     .header {
-      position: absolute; top: 0; left: 0; right: 0;
+      position: absolute;
+      top: 0;
+      left: 0;
+      right: 0;
       padding: 12px 16px;
-      display: flex; justify-content: space-between; align-items: center;
-      z-index: 20; pointer-events: none;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      z-index: 20;
+      pointer-events: none;
     }
+
     .header-left, .header-right {
-      display: flex; gap: 6px; align-items: center; pointer-events: auto;
+      display: flex;
+      gap: 6px;
+      align-items: center;
+      pointer-events: auto;
     }
 
     .icon-btn {
-      width: 36px; height: 36px; border-radius: 10px; border: 1px solid rgba(0,0,0,0.08);
-      background: rgba(255,255,255,0.92); backdrop-filter: blur(6px);
-      display: flex; justify-content: center; align-items: center;
-      cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      transition: all 0.2s; color: var(--text-main); font-weight: 700; font-size: 0.75rem;
+      width: 36px;
+      height: 36px;
+      border-radius: 10px;
+      border: 1px solid rgba(0,0,0,0.08);
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(6px);
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: all 0.2s;
+      color: var(--text-main);
+      font-weight: 700;
+      font-size: 0.75rem;
     }
-    .icon-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
+
+    .icon-btn.active {
+      background: var(--accent);
+      color: #fff;
+      border-color: var(--accent);
+    }
+
     .icon-btn:active { transform: scale(0.94); }
 
     .pill-btn {
-      padding: 7px 11px; border-radius: 20px; border: 1px solid rgba(0,0,0,0.08);
-      background: rgba(255,255,255,0.92); backdrop-filter: blur(6px);
-      font-size: 0.72rem; font-weight: 700;
-      color: var(--text-main); cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      transition: all 0.2s; display: flex; align-items: center; gap: 4px;
+      padding: 7px 11px;
+      border-radius: 20px;
+      border: 1px solid rgba(0,0,0,0.08);
+      background: rgba(255,255,255,0.92);
+      backdrop-filter: blur(6px);
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-main);
+      cursor: pointer;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 4px;
     }
-    .pill-btn:hover { background: #fff; }
-    .pill-btn.active { background: var(--primary); color: white; border-color: var(--primary); }
 
-    /* Lienzo 3D y Capa de Líneas Guía */
-    #viewport { position: relative; flex: 1; width: 100%; height: 100%; overflow: hidden; }
-    canvas { width: 100% !important; height: 100% !important; display: block; outline: none; }
+    .pill-btn:hover { background: #fff; }
+
+    .pill-btn.active {
+      background: var(--primary);
+      color: white;
+      border-color: var(--primary);
+    }
+
+    /* El lienzo continúa detrás del acordeón */
+    #viewport {
+      position: absolute;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      overflow: hidden;
+    }
+
+    canvas {
+      width: 100% !important;
+      height: 100% !important;
+      display: block;
+      outline: none;
+    }
 
     #callout-svg {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      pointer-events: none; z-index: 10;
-    }
-    #pins-layer {
-      position: absolute; top: 0; left: 0; width: 100%; height: 100%;
-      pointer-events: none; z-index: 12;
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 10;
     }
 
-    /* Pines Numerados */
+    #pins-layer {
+      position: absolute;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      pointer-events: none;
+      z-index: 12;
+    }
+
+    /* Pines numerados */
     .pin {
-      position: absolute; width: 28px; height: 28px; margin-left: -14px; margin-top: -14px;
-      border-radius: 50%; background: #ffffff; color: var(--text-main);
-      font-weight: 700; font-size: 0.78rem;
-      display: flex; justify-content: center; align-items: center;
+      position: absolute;
+      width: 28px;
+      height: 28px;
+      margin-left: -14px;
+      margin-top: -14px;
+      border-radius: 50%;
+      background: #ffffff;
+      color: var(--text-main);
+      font-weight: 700;
+      font-size: 0.78rem;
+      display: flex;
+      justify-content: center;
+      align-items: center;
       box-shadow: 0 3px 10px rgba(0,0,0,0.22);
       border: 2px solid #cbd5e1;
-      cursor: pointer; pointer-events: auto;
+      cursor: pointer;
+      pointer-events: auto;
       transition: transform 0.2s, background 0.2s, color 0.2s, border-color 0.2s;
     }
+
     .pin:hover { transform: scale(1.1); }
+
     .pin.active {
-      background: var(--accent); color: #fff; border-color: #fff;
+      background: var(--accent);
+      color: #fff;
+      border-color: #fff;
       transform: scale(1.22);
-      box-shadow: 0 0 0 4px rgba(249, 115, 22, 0.35), 0 4px 12px rgba(0,0,0,0.3);
+      box-shadow: 0 0 0 4px rgba(249,115,22,0.35), 0 4px 12px rgba(0,0,0,0.3);
       z-index: 15;
     }
 
-    /* Punto de anclaje sobre la máquina */
     .anchor-dot {
-      position: absolute; width: 8px; height: 8px; margin-left: -4px; margin-top: -4px;
-      border-radius: 50%; background: var(--primary); border: 2px solid #fff;
-      box-shadow: 0 1px 4px rgba(0,0,0,0.4); pointer-events: none;
+      position: absolute;
+      width: 8px;
+      height: 8px;
+      margin-left: -4px;
+      margin-top: -4px;
+      border-radius: 50%;
+      background: var(--primary);
+      border: 2px solid #fff;
+      box-shadow: 0 1px 4px rgba(0,0,0,0.4);
+      pointer-events: none;
     }
-    .anchor-dot.active { background: var(--accent); transform: scale(1.3); }
 
-    /* Tarjeta Inferior */
-    .bottom-area {
-      position: absolute; bottom: 0; left: 0; right: 0;
-      padding: 8px 12px 12px;
-      display: flex; flex-direction: column; gap: 5px;
-      z-index: 25; pointer-events: none;
+    .anchor-dot.active {
+      background: var(--accent);
+      transform: scale(1.3);
     }
+
+    /* Acordeón y navegación */
+    .bottom-area {
+      position: absolute;
+      bottom: 0;
+      left: 0;
+      right: 0;
+      padding: 8px 12px 12px;
+      display: flex;
+      flex-direction: column;
+      gap: 5px;
+      z-index: 25;
+      pointer-events: none;
+    }
+
     .info-card {
-      background: var(--card-bg); backdrop-filter: blur(12px);
-      border-radius: 16px; padding: 11px 13px;
+      background: var(--card-bg);
+      backdrop-filter: blur(12px);
+      border-radius: 16px;
+      padding: 0;
       box-shadow: 0 8px 30px rgba(0,0,0,0.16);
       border: 1px solid rgba(255,255,255,0.8);
       pointer-events: auto;
-      display: flex; flex-direction: column; gap: 6px;
+      display: flex;
+      flex-direction: column;
+      gap: 0;
     }
 
     .card-top-row {
-      display: flex; justify-content: space-between; align-items: center; gap: 8px;
+      width: 100%;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      gap: 12px;
+      padding: 13px;
+      border: 0;
+      background: transparent;
+      text-align: left;
+      font: inherit;
+      cursor: pointer;
+      color: var(--primary);
+      border-radius: 16px;
     }
-    .info-card h2 {
-      font-size: 0.94rem; color: var(--primary); font-weight: 800; line-height: 1.2;
+
+    .card-top-row:focus-visible, .anim-btn:focus-visible {
+      outline: 3px solid var(--accent);
+      outline-offset: 3px;
+    }
+
+    .accordion-arrow {
+      width: 18px;
+      height: 18px;
+      flex-shrink: 0;
+      transition: transform 0.2s;
+    }
+
+    .card-top-row[aria-expanded="true"] .accordion-arrow {
+      transform: rotate(180deg);
+    }
+
+    .card-details {
+      display: flex;
+      flex-direction: column;
+      gap: 6px;
+      padding: 0 13px 12px;
+    }
+
+    .card-details[hidden], .anim-btn[hidden] { display: none; }
+
+    .card-title, .info-card h2 {
+      font-size: 0.94rem;
+      color: var(--primary);
+      font-weight: 800;
+      line-height: 1.2;
+    }
+
+    @media (max-height: 600px) {
+      .card-details {
+        max-height: 100px;
+        overflow-y: auto;
+      }
     }
 
     .info-capsule {
-      display: flex; align-items: center; gap: 8px;
-      background: #f1f5f9; border-radius: 12px; padding: 6px 9px;
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      background: #f1f5f9;
+      border-radius: 12px;
+      padding: 6px 9px;
       border: 1px solid rgba(0,0,0,0.03);
     }
+
     .capsule-icon {
-      width: 28px; height: 28px; border-radius: 50%; background: #ffffff;
-      display: flex; justify-content: center; align-items: center;
-      font-size: 0.82rem; box-shadow: 0 2px 5px rgba(0,0,0,0.05); flex-shrink: 0;
+      width: 28px;
+      height: 28px;
+      border-radius: 50%;
+      background: #ffffff;
+      display: flex;
+      justify-content: center;
+      align-items: center;
+      font-size: 0.82rem;
+      box-shadow: 0 2px 5px rgba(0,0,0,0.05);
+      flex-shrink: 0;
     }
-    .capsule-content { display: flex; flex-direction: column; width: 100%; }
+
+    .capsule-content {
+      display: flex;
+      flex-direction: column;
+      width: 100%;
+    }
+
     .capsule-label {
-      font-size: 0.60rem; font-weight: 700; color: var(--text-muted);
-      text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 0px;
+      font-size: 0.60rem;
+      font-weight: 700;
+      color: var(--text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.4px;
+      margin-bottom: 0;
     }
+
     .capsule-text {
-      font-size: 0.74rem; font-weight: 400; color: var(--text-main); line-height: 1.2;
+      font-size: 0.74rem;
+      font-weight: 400;
+      color: var(--text-main);
+      line-height: 1.2;
     }
 
     .anim-btn {
-      background: var(--accent); color: white; border: none;
-      padding: 6px 12px; border-radius: 14px; font-weight: 700;
-      font-size: 0.7rem; letter-spacing: 0.5px; cursor: pointer;
-      box-shadow: 0 3px 10px rgba(249, 115, 22, 0.35);
-      transition: all 0.2s; white-space: nowrap; flex-shrink: 0;
+      align-self: flex-end;
+      pointer-events: auto;
+      margin: 0 2px 3px 0;
+      background: var(--accent);
+      color: white;
+      border: none;
+      padding: 6px 12px;
+      border-radius: 14px;
+      font-weight: 700;
+      font-size: 0.7rem;
+      letter-spacing: 0.5px;
+      cursor: pointer;
+      box-shadow: 0 3px 10px rgba(249,115,22,0.35);
+      transition: all 0.2s;
+      white-space: nowrap;
+      flex-shrink: 0;
     }
-    .anim-btn.playing { background: #dc2626; box-shadow: 0 3px 10px rgba(220, 38, 38, 0.4); }
+
+    .anim-btn.playing {
+      background: #dc2626;
+      box-shadow: 0 3px 10px rgba(220,38,38,0.4);
+    }
+
     .anim-btn:active { transform: scale(0.95); }
 
     .stepper {
-      align-self: center; display: flex; align-items: center;
-      background: rgba(255,255,255,0.95); border-radius: 10px;
-      box-shadow: 0 4px 15px rgba(0,0,0,0.12); overflow: hidden;
-      pointer-events: auto; border: 1px solid rgba(0,0,0,0.06);
+      align-self: center;
+      display: flex;
+      align-items: center;
+      background: rgba(255,255,255,0.95);
+      border-radius: 10px;
+      box-shadow: 0 4px 15px rgba(0,0,0,0.12);
+      overflow: hidden;
+      pointer-events: auto;
+      border: 1px solid rgba(0,0,0,0.06);
     }
+
     .stepper button {
-      background: transparent; border: none; width: 36px; height: 28px;
-      font-size: 0.9rem; font-weight: bold; color: var(--text-main);
-      cursor: pointer; transition: background 0.15s;
+      background: transparent;
+      border: none;
+      width: 36px;
+      height: 28px;
+      font-size: 0.9rem;
+      font-weight: bold;
+      color: var(--text-main);
+      cursor: pointer;
+      transition: background 0.15s;
     }
+
     .stepper button:hover { background: #f1f5f9; }
+
     .stepper span {
-      padding: 0 12px; font-size: 0.78rem; font-weight: 700; color: var(--text-main);
-      border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0;
+      padding: 0 12px;
+      font-size: 0.78rem;
+      font-weight: 700;
+      color: var(--text-main);
+      border-left: 1px solid #e2e8f0;
+      border-right: 1px solid #e2e8f0;
     }
 
     #loading-screen {
-      position: absolute; inset: 0; background: rgba(15, 23, 42, 0.92);
-      backdrop-filter: blur(8px); z-index: 50;
-      display: flex; flex-direction: column; justify-content: center; align-items: center;
-      color: white; text-align: center; padding: 30px;
+      position: absolute;
+      inset: 0;
+      background: rgba(15,23,42,0.92);
+      backdrop-filter: blur(8px);
+      z-index: 50;
+      display: flex;
+      flex-direction: column;
+      justify-content: center;
+      align-items: center;
+      color: white;
+      text-align: center;
+      padding: 30px;
       transition: opacity 0.4s ease;
     }
-    #loading-screen.hidden { opacity: 0; pointer-events: none; }
-    .loader-spinner {
-      width: 44px; height: 44px; border: 4px solid rgba(255,255,255,0.2);
-      border-top-color: var(--accent); border-radius: 50%;
-      animation: spin 0.9s linear infinite; margin-bottom: 14px;
+
+    #loading-screen.hidden {
+      opacity: 0;
+      pointer-events: none;
     }
+
+    .loader-spinner {
+      width: 44px;
+      height: 44px;
+      border: 4px solid rgba(255,255,255,0.2);
+      border-top-color: var(--accent);
+      border-radius: 50%;
+      animation: spin 0.9s linear infinite;
+      margin-bottom: 14px;
+    }
+
     @keyframes spin { to { transform: rotate(360deg); } }
-    .loader-text { font-size: 0.88rem; font-weight: 600; color: #cbd5e1; }
+
+    .loader-text {
+      font-size: 0.88rem;
+      font-weight: 600;
+      color: #cbd5e1;
+    }
   </style>
 
   <script type="importmap">
@@ -238,33 +478,54 @@
   </div>
 
   <div class="bottom-area">
+    <button class="anim-btn" id="btn-anim" hidden>ANIMAR</button>
+
     <div class="info-card" id="info-card">
-      <div class="card-top-row">
-        <h2 id="part-title">1. Cabezal y eje principal</h2>
-        <button class="anim-btn" id="btn-anim">ANIMAR</button>
-      </div>
+      <h2>
+        <button
+          class="card-top-row"
+          id="btn-accordion"
+          type="button"
+          aria-expanded="false"
+          aria-controls="card-details"
+        >
+          <span class="card-title" id="part-title">Vista general del torno</span>
+          <svg
+            class="accordion-arrow"
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            stroke-width="2.5"
+            aria-hidden="true"
+          >
+            <path d="m6 9 6 6 6-6" />
+          </svg>
+        </button>
+      </h2>
 
-      <div class="info-capsule">
-        <div class="capsule-icon">📍</div>
-        <div class="capsule-content">
-          <span class="capsule-label">Ubicación en la máquina</span>
-          <span class="capsule-text" id="part-loc">Extremo izquierdo de la máquina</span>
+      <div class="card-details" id="card-details" hidden>
+        <div class="info-capsule">
+          <div class="capsule-icon">📍</div>
+          <div class="capsule-content">
+            <span class="capsule-label">Ubicación en la máquina</span>
+            <span class="capsule-text" id="part-loc">Vista completa de la máquina</span>
+          </div>
         </div>
-      </div>
 
-      <div class="info-capsule">
-        <div class="capsule-icon">⚙️</div>
-        <div class="capsule-content">
-          <span class="capsule-label">Para qué sirve</span>
-          <span class="capsule-text" id="part-func">Sostiene el plato y lo hace girar con la pieza.</span>
+        <div class="info-capsule">
+          <div class="capsule-icon">⚙️</div>
+          <div class="capsule-content">
+            <span class="capsule-label">Para qué sirve</span>
+            <span class="capsule-text" id="part-func">Selecciona un pin o avanza al paso 1 para explorar sus partes.</span>
+          </div>
         </div>
       </div>
     </div>
 
     <div class="stepper">
-      <button id="btn-prev">❮</button>
-      <span id="step-counter">1 / 10</span>
-      <button id="btn-next">❯</button>
+      <button id="btn-prev" aria-label="Paso anterior">❮</button>
+      <span id="step-counter" aria-live="polite">Vista general</span>
+      <button id="btn-next" aria-label="Paso siguiente">❯</button>
     </div>
   </div>
 </div>
@@ -371,6 +632,7 @@
       loc: "Debajo del cabezal, a la izquierda",
       func: "Permiten elegir distintos avances y pasos de rosca sin cambiar engranes a cada rato.",
       animClip: "Handwheels_Rotate",
+      overviewDirection: new THREE.Vector3(0.18, 0.30, 1),
       camPos: new THREE.Vector3(-0.5, 1.45, 1.8),
       camTargetOffset: new THREE.Vector3(0, -0.18, 0)
     },
@@ -392,7 +654,12 @@
   const pinsLayer = document.getElementById('pins-layer');
 
   const scene = new THREE.Scene();
-  const camera = new THREE.PerspectiveCamera(42, viewport.clientWidth / viewport.clientHeight, 0.1, 50);
+  const camera = new THREE.PerspectiveCamera(
+    42,
+    viewport.clientWidth / viewport.clientHeight,
+    0.1,
+    50
+  );
 
   const DEFAULT_CAM_POS = new THREE.Vector3(2.3, 2.35, 3.6);
   const DEFAULT_CAM_TARGET = new THREE.Vector3(0.0, 0.95, 0.0);
@@ -414,6 +681,7 @@
   controls.maxDistance = 8.0;
 
   scene.add(new THREE.HemisphereLight(0xffffff, 0x94a3b8, 1.6));
+
   const dirLight1 = new THREE.DirectionalLight(0xffffff, 2.2);
   dirLight1.position.set(4, 6, 5);
   scene.add(dirLight1);
@@ -426,20 +694,23 @@
   let mixer = null;
   let animationsMap = {};
   let currentAction = null;
-  let currentPartIndex = 0;
+  let currentPartIndex = -1;
   let isExploded = false;
   let pinsVisible = true;
   let camAnim = null;
 
   const pinElements = [];
+
   PARTS_DATA.forEach((part, idx) => {
     const pin = document.createElement('div');
     pin.className = 'pin';
     pin.textContent = part.id;
+
     pin.addEventListener('click', (e) => {
       e.stopPropagation();
       selectPart(idx, true);
     });
+
     pinsLayer.appendChild(pin);
 
     const dot = document.createElement('div');
@@ -456,7 +727,12 @@
 
   function highlightNode(targetNodeName) {
     if (!latheRoot) return;
-    originalMaterials.forEach((mat, mesh) => { mesh.material = mat; });
+
+    originalMaterials.forEach((mat, mesh) => {
+      mesh.material = mat;
+    });
+
+    if (!targetNodeName) return;
 
     const targetNode = latheRoot.getObjectByName(targetNodeName);
     if (!targetNode) return;
@@ -482,6 +758,7 @@
 
     pinElements.forEach((item, idx) => {
       const isSelected = idx === currentPartIndex;
+
       item.pin.classList.toggle('active', isSelected);
       item.dot.classList.toggle('active', isSelected);
 
@@ -496,19 +773,28 @@
       }
     });
 
+    btnAnim.hidden = false;
     highlightNode(part.nodeName);
     stopCurrentAnimation();
 
-    if (flyCamera && !isExploded) {
+    if (flyCamera && !isExploded && latheRoot) {
+      if (part.overviewDirection) {
+        frameOverview(true, part.overviewDirection);
+        return;
+      }
+
       const node = latheRoot.getObjectByName(part.nodeName);
       let center = part.anchor3D.clone();
+
       if (node) {
         const box = new THREE.Box3().setFromObject(node);
         box.getCenter(center);
       }
 
-      const finalTarget = center.clone().add(part.camTargetOffset);
-      const finalPos = part.camPos.clone().add(part.camTargetOffset);
+      const finalTarget = center.clone();
+      const finalPos = center.clone().add(
+        part.camPos.clone().sub(part.anchor3D)
+      );
 
       animateCameraTo(finalPos, finalTarget);
     }
@@ -525,17 +811,20 @@
   }
 
   const btnAnim = document.getElementById('btn-anim');
+
   function stopCurrentAnimation() {
     if (currentAction) {
       currentAction.fadeOut(0.25);
       currentAction = null;
     }
+
     btnAnim.textContent = 'ANIMAR';
     btnAnim.classList.remove('playing');
   }
 
   btnAnim.addEventListener('click', () => {
-    if (!mixer) return;
+    if (!mixer || currentPartIndex < 0) return;
+
     const part = PARTS_DATA[currentPartIndex];
     const clip = animationsMap[part.animClip];
     if (!clip) return;
@@ -558,8 +847,10 @@
   });
 
   const btnExplode = document.getElementById('btn-explode');
+
   function toggleExplodedView(forceState) {
     if (!mixer) return;
+
     isExploded = forceState !== undefined ? forceState : !isExploded;
     btnExplode.classList.toggle('active', isExploded);
 
@@ -568,6 +859,7 @@
 
     const clipName = isExploded ? 'Exploded_View' : 'Exploded_Reset';
     const clip = animationsMap[clipName];
+
     if (clip) {
       const action = mixer.clipAction(clip);
       action.reset();
@@ -577,26 +869,33 @@
     }
 
     if (isExploded) {
-      animateCameraTo(new THREE.Vector3(2.5, 2.6, 3.9), new THREE.Vector3(0, 1.15, 0));
+      animateCameraTo(
+        new THREE.Vector3(2.5, 2.6, 3.9),
+        new THREE.Vector3(0, 1.15, 0)
+      );
     } else {
       animateCameraTo(DEFAULT_CAM_POS, DEFAULT_CAM_TARGET);
     }
   }
+
   btnExplode.addEventListener('click', () => toggleExplodedView());
 
   const btnTogglePins = document.getElementById('btn-toggle-pins');
+
   btnTogglePins.addEventListener('click', () => {
     pinsVisible = !pinsVisible;
     pinsLayer.style.display = pinsVisible ? 'block' : 'none';
     svgLayer.style.display = pinsVisible ? 'block' : 'none';
     btnTogglePins.classList.toggle('active', !pinsVisible);
+    resizeViewport();
   });
 
   document.getElementById('btn-reset-cam').addEventListener('click', () => {
-    animateCameraTo(DEFAULT_CAM_POS, DEFAULT_CAM_TARGET);
+    showOverview();
   });
 
   const appContainer = document.getElementById('app-container');
+
   document.getElementById('btn-fullscreen').addEventListener('click', () => {
     if (!document.fullscreenElement) {
       appContainer.requestFullscreen?.() || appContainer.webkitRequestFullscreen?.();
@@ -605,8 +904,16 @@
     }
   });
 
-  document.getElementById('btn-prev').addEventListener('click', () => selectPart(currentPartIndex - 1, true));
-  document.getElementById('btn-next').addEventListener('click', () => selectPart(currentPartIndex + 1, true));
+  document.getElementById('btn-prev').addEventListener('click', () => {
+    selectPart(
+      currentPartIndex < 0 ? PARTS_DATA.length - 1 : currentPartIndex - 1,
+      true
+    );
+  });
+
+  document.getElementById('btn-next').addEventListener('click', () => {
+    selectPart(currentPartIndex + 1, true);
+  });
 
   const loader = new GLTFLoader();
   const loadingScreen = document.getElementById('loading-screen');
@@ -620,32 +927,39 @@
       scene.add(latheRoot);
 
       originalMaterials.clear();
+
       latheRoot.traverse((child) => {
         if (child.isMesh) originalMaterials.set(child, child.material);
       });
 
       mixer = new THREE.AnimationMixer(latheRoot);
       animationsMap = {};
-      gltf.animations.forEach((clip) => { animationsMap[clip.name] = clip; });
+
+      gltf.animations.forEach((clip) => {
+        animationsMap[clip.name] = clip;
+      });
 
       loadingScreen.classList.add('hidden');
-      selectPart(0, false);
+      showOverview(false);
     },
     (xhr) => {
       if (xhr.lengthComputable) {
         const percent = Math.round((xhr.loaded / xhr.total) * 100);
-        document.querySelector('.loader-text').textContent = `Cargando Torno 3D... ${percent}%`;
+        document.querySelector('.loader-text').textContent =
+          `Cargando Torno 3D... ${percent}%`;
       }
     },
     (error) => {
       console.error('Error al cargar el modelo 3D:', error);
-      document.querySelector('.loader-text').textContent = 'Error al cargar el modelo desde GitHub.';
+      document.querySelector('.loader-text').textContent =
+        'Error al cargar el modelo desde GitHub.';
     }
   );
 
-  // --- DISTRIBUCIÓN RESPONSIVE OPTIMIZADA PARA MÓVIL (Márgenes y separación de pines) ---
+  /* Distribución de pines y líneas guía */
   function updateCallouts() {
     if (!latheRoot || !pinsVisible) return;
+
     const width = viewport.clientWidth;
     const height = viewport.clientHeight;
     const totalPins = pinElements.length;
@@ -653,6 +967,7 @@
     pinElements.forEach((item, idx) => {
       const worldPos = item.part.anchor3D.clone();
       const node = latheRoot.getObjectByName(item.part.nodeName);
+
       if (node) {
         const box = new THREE.Box3().setFromObject(node);
         box.getCenter(worldPos);
@@ -665,13 +980,11 @@
       item.dot.style.left = `${ax}px`;
       item.dot.style.top = `${ay}px`;
 
-      // Márgenes laterales adaptados para dispositivos móviles (evita que seamontonen en los extremos)
       const marginX = 16;
-      const usableW = width - (marginX * 2);
+      const usableW = width - marginX * 2;
       const ratio = idx / Math.max(1, totalPins - 1);
 
-      const px = marginX + (ratio * usableW);
-      // Altura escalonada limpia en la franja superior
+      const px = marginX + ratio * usableW;
       const py = 112 + (idx % 2) * 25;
 
       item.pin.style.left = `${px}px`;
@@ -684,7 +997,160 @@
     });
   }
 
+  /* El canvas continúa detrás de la tarjeta.
+     El encuadre se centra en el área libre. */
+  function reservedTop() {
+    return Math.min(
+      pinsVisible ? 160 : 64,
+      viewport.clientHeight * 0.38
+    );
+  }
+
+  function reservedBottom() {
+    return document.querySelector('.bottom-area').getBoundingClientRect().height;
+  }
+
+  function overviewPose(
+    viewDirection = DEFAULT_CAM_POS.clone().sub(DEFAULT_CAM_TARGET)
+  ) {
+    if (!latheRoot) {
+      return {
+        position: DEFAULT_CAM_POS.clone(),
+        target: DEFAULT_CAM_TARGET.clone()
+      };
+    }
+
+    const box = new THREE.Box3().setFromObject(latheRoot);
+    const target = box.getCenter(new THREE.Vector3());
+    const direction = viewDirection.clone().normalize();
+
+    const right = new THREE.Vector3()
+      .crossVectors(camera.up, direction)
+      .normalize();
+
+    const up = new THREE.Vector3()
+      .crossVectors(direction, right)
+      .normalize();
+
+    const tanV = Math.tan(THREE.MathUtils.degToRad(camera.fov / 2));
+    const tanH = tanV * camera.aspect;
+
+    const usableV = tanV * Math.max(
+      1,
+      viewport.clientHeight - reservedTop() - reservedBottom()
+    ) / viewport.clientHeight;
+
+    let distance = 1;
+
+    for (const x of [box.min.x, box.max.x]) {
+      for (const y of [box.min.y, box.max.y]) {
+        for (const z of [box.min.z, box.max.z]) {
+          const offset = new THREE.Vector3(x, y, z).sub(target);
+
+          distance = Math.max(
+            distance,
+            offset.dot(direction) + Math.max(
+              Math.abs(offset.dot(right)) / tanH,
+              Math.abs(offset.dot(up)) / usableV
+            ) * 1.12
+          );
+        }
+      }
+    }
+
+    controls.maxDistance = Math.max(8, distance * 1.5);
+
+    return {
+      position: target.clone().addScaledVector(direction, distance),
+      target
+    };
+  }
+
+  function frameOverview(smooth = true, viewDirection) {
+    const pose = overviewPose(viewDirection);
+
+    if (smooth) {
+      animateCameraTo(pose.position, pose.target);
+    } else {
+      camAnim = null;
+      camera.position.copy(pose.position);
+      controls.target.copy(pose.target);
+      controls.update();
+    }
+  }
+
+  function showOverview(smooth = true) {
+    currentPartIndex = -1;
+    stopCurrentAnimation();
+    btnAnim.hidden = true;
+
+    document.getElementById('part-title').textContent = 'Vista general del torno';
+    document.getElementById('part-loc').textContent = 'Vista completa de la máquina';
+    document.getElementById('part-func').textContent =
+      'Selecciona un pin o avanza al paso 1 para explorar sus partes.';
+    document.getElementById('step-counter').textContent = 'Vista general';
+
+    pinElements.forEach(({ pin, dot, line }) => {
+      pin.classList.remove('active');
+      dot.classList.remove('active');
+      line.setAttribute('stroke', '#94a3b8');
+      line.setAttribute('stroke-width', '1.4');
+      line.setAttribute('stroke-dasharray', '4, 4');
+    });
+
+    highlightNode(null);
+    resizeViewport();
+    frameOverview(smooth);
+  }
+
+  document.getElementById('btn-accordion').addEventListener('click', (event) => {
+    const button = event.currentTarget;
+    const expanded = button.getAttribute('aria-expanded') !== 'true';
+
+    button.setAttribute('aria-expanded', String(expanded));
+    document.getElementById('card-details').hidden = !expanded;
+
+    resizeViewport();
+  });
+
+  function resizeViewport() {
+    const w = viewport.clientWidth;
+    const h = viewport.clientHeight;
+
+    if (!w || !h) return;
+
+    camera.aspect = w / h;
+    camera.setViewOffset(
+      w,
+      h,
+      0,
+      (reservedBottom() - reservedTop()) / 2,
+      w,
+      h
+    );
+    camera.updateProjectionMatrix();
+    renderer.setSize(w, h);
+
+    if (latheRoot && currentPartIndex < 0) {
+      frameOverview(false);
+    } else if (
+      latheRoot &&
+      !isExploded &&
+      PARTS_DATA[currentPartIndex]?.overviewDirection
+    ) {
+      frameOverview(
+        Boolean(camAnim),
+        PARTS_DATA[currentPartIndex].overviewDirection
+      );
+    }
+  }
+
+  const layoutObserver = new ResizeObserver(resizeViewport);
+  layoutObserver.observe(viewport);
+  layoutObserver.observe(document.querySelector('.bottom-area'));
+
   const clock = new THREE.Clock();
+
   function animate() {
     requestAnimationFrame(animate);
     const delta = clock.getDelta();
@@ -693,10 +1159,22 @@
 
     if (camAnim) {
       camAnim.progress += delta * 2.2;
+
       const t = Math.min(1, camAnim.progress);
       const ease = 1 - Math.pow(1 - t, 3);
-      camera.position.lerpVectors(camAnim.startPos, camAnim.endPos, ease);
-      controls.target.lerpVectors(camAnim.startLook, camAnim.endLook, ease);
+
+      camera.position.lerpVectors(
+        camAnim.startPos,
+        camAnim.endPos,
+        ease
+      );
+
+      controls.target.lerpVectors(
+        camAnim.startLook,
+        camAnim.endLook,
+        ease
+      );
+
       if (t >= 1) camAnim = null;
     }
 
@@ -704,15 +1182,10 @@
     renderer.render(scene, camera);
     updateCallouts();
   }
+
   animate();
 
-  window.addEventListener('resize', () => {
-    const w = viewport.clientWidth;
-    const h = viewport.clientHeight;
-    camera.aspect = w / h;
-    camera.updateProjectionMatrix();
-    renderer.setSize(w, h);
-  });
+  window.addEventListener('resize', resizeViewport);
 </script>
 </body>
 </html>
