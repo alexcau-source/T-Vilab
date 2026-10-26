@@ -12,7 +12,7 @@
       --bg-grad-bot: #cfd8e3;
       --card-bg: rgba(255, 255, 255, 0.96);
       --text-main: #1e293b;
-      --text-muted: #475569;
+      --text-muted: #64748b;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; user-select: none; -webkit-user-select: none; }
@@ -50,7 +50,7 @@
     /* Cabecera unificada superior */
     .header {
       position: absolute; top: 0; left: 0; right: 0;
-      padding: 14px 16px;
+      padding: 12px 16px;
       display: flex; justify-content: space-between; align-items: center;
       z-index: 20; pointer-events: none;
     }
@@ -59,19 +59,19 @@
     }
 
     .icon-btn {
-      width: 38px; height: 38px; border-radius: 10px; border: 1px solid rgba(0,0,0,0.08);
+      width: 36px; height: 36px; border-radius: 10px; border: 1px solid rgba(0,0,0,0.08);
       background: rgba(255,255,255,0.92); backdrop-filter: blur(6px);
       display: flex; justify-content: center; align-items: center;
       cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
-      transition: all 0.2s; color: var(--text-main); font-weight: 700; font-size: 0.78rem;
+      transition: all 0.2s; color: var(--text-main); font-weight: 700; font-size: 0.75rem;
     }
     .icon-btn.active { background: var(--accent); color: #fff; border-color: var(--accent); }
     .icon-btn:active { transform: scale(0.94); }
 
     .pill-btn {
-      padding: 8px 12px; border-radius: 20px; border: 1px solid rgba(0,0,0,0.08);
+      padding: 7px 11px; border-radius: 20px; border: 1px solid rgba(0,0,0,0.08);
       background: rgba(255,255,255,0.92); backdrop-filter: blur(6px);
-      font-size: 0.74rem; font-weight: 700;
+      font-size: 0.72rem; font-weight: 700;
       color: var(--text-main); cursor: pointer; box-shadow: 0 2px 8px rgba(0,0,0,0.08);
       transition: all 0.2s; display: flex; align-items: center; gap: 4px;
     }
@@ -93,9 +93,9 @@
 
     /* Pines Numerados */
     .pin {
-      position: absolute; width: 30px; height: 30px; margin-left: -15px; margin-top: -15px;
+      position: absolute; width: 28px; height: 28px; margin-left: -14px; margin-top: -14px;
       border-radius: 50%; background: #ffffff; color: var(--text-main);
-      font-weight: 700; font-size: 0.82rem;
+      font-weight: 700; font-size: 0.78rem;
       display: flex; justify-content: center; align-items: center;
       box-shadow: 0 3px 10px rgba(0,0,0,0.22);
       border: 2px solid #cbd5e1;
@@ -112,70 +112,81 @@
 
     /* Punto de anclaje sobre la máquina */
     .anchor-dot {
-      position: absolute; width: 9px; height: 9px; margin-left: -4.5px; margin-top: -4.5px;
+      position: absolute; width: 8px; height: 8px; margin-left: -4px; margin-top: -4px;
       border-radius: 50%; background: var(--primary); border: 2px solid #fff;
       box-shadow: 0 1px 4px rgba(0,0,0,0.4); pointer-events: none;
     }
     .anchor-dot.active { background: var(--accent); transform: scale(1.3); }
 
-    /* Tarjeta Inferior (Bottom Sheet) */
+    /* Tarjeta Inferior */
     .bottom-area {
       position: absolute; bottom: 0; left: 0; right: 0;
-      padding: 10px 16px 16px;
-      display: flex; flex-direction: column; gap: 8px;
+      padding: 8px 12px 12px;
+      display: flex; flex-direction: column; gap: 5px;
       z-index: 25; pointer-events: none;
     }
     .info-card {
       background: var(--card-bg); backdrop-filter: blur(12px);
-      border-radius: 16px; padding: 14px 16px;
+      border-radius: 16px; padding: 11px 13px;
       box-shadow: 0 8px 30px rgba(0,0,0,0.16);
       border: 1px solid rgba(255,255,255,0.8);
       pointer-events: auto;
+      display: flex; flex-direction: column; gap: 6px;
+    }
+
+    .card-top-row {
+      display: flex; justify-content: space-between; align-items: center; gap: 8px;
     }
     .info-card h2 {
-      font-size: 1.05rem; color: var(--primary); margin-bottom: 8px; font-weight: 800;
+      font-size: 0.94rem; color: var(--primary); font-weight: 800; line-height: 1.2;
     }
-    .info-row { font-size: 0.81rem; color: var(--text-main); margin-bottom: 5px; line-height: 1.3; }
-    .info-row strong { font-weight: 700; color: #0f172a; font-size: 0.72rem; display: block; text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 1px; color: var(--text-muted); }
-    .info-row span { font-size: 0.84rem; color: var(--text-main); font-weight: 500; }
-    .card-footer {
-      display: flex; justify-content: space-between; align-items: center;
-      margin-top: 8px; padding-top: 8px; border-top: 1px solid #e2e8f0; gap: 8px;
+
+    .info-capsule {
+      display: flex; align-items: center; gap: 8px;
+      background: #f1f5f9; border-radius: 12px; padding: 6px 9px;
+      border: 1px solid rgba(0,0,0,0.03);
     }
-    .warning-text {
-      font-size: 0.74rem; color: #b45309; background: #fef3c7;
-      padding: 6px 10px; border-radius: 8px; flex: 1; line-height: 1.25;
-      border-left: 3px solid #f59e0b;
+    .capsule-icon {
+      width: 28px; height: 28px; border-radius: 50%; background: #ffffff;
+      display: flex; justify-content: center; align-items: center;
+      font-size: 0.82rem; box-shadow: 0 2px 5px rgba(0,0,0,0.05); flex-shrink: 0;
     }
+    .capsule-content { display: flex; flex-direction: column; width: 100%; }
+    .capsule-label {
+      font-size: 0.60rem; font-weight: 700; color: var(--text-muted);
+      text-transform: uppercase; letter-spacing: 0.4px; margin-bottom: 0px;
+    }
+    .capsule-text {
+      font-size: 0.74rem; font-weight: 400; color: var(--text-main); line-height: 1.2;
+    }
+
     .anim-btn {
       background: var(--accent); color: white; border: none;
-      padding: 9px 15px; border-radius: 18px; font-weight: 700;
-      font-size: 0.76rem; letter-spacing: 0.5px; cursor: pointer;
-      box-shadow: 0 4px 12px rgba(249, 115, 22, 0.35);
-      transition: all 0.2s; white-space: nowrap;
+      padding: 6px 12px; border-radius: 14px; font-weight: 700;
+      font-size: 0.7rem; letter-spacing: 0.5px; cursor: pointer;
+      box-shadow: 0 3px 10px rgba(249, 115, 22, 0.35);
+      transition: all 0.2s; white-space: nowrap; flex-shrink: 0;
     }
-    .anim-btn.playing { background: #dc2626; box-shadow: 0 4px 12px rgba(220, 38, 38, 0.4); }
+    .anim-btn.playing { background: #dc2626; box-shadow: 0 3px 10px rgba(220, 38, 38, 0.4); }
     .anim-btn:active { transform: scale(0.95); }
 
-    /* Paginación < 1 / 10 > */
     .stepper {
       align-self: center; display: flex; align-items: center;
-      background: rgba(255,255,255,0.95); border-radius: 12px;
+      background: rgba(255,255,255,0.95); border-radius: 10px;
       box-shadow: 0 4px 15px rgba(0,0,0,0.12); overflow: hidden;
       pointer-events: auto; border: 1px solid rgba(0,0,0,0.06);
     }
     .stepper button {
-      background: transparent; border: none; width: 42px; height: 34px;
-      font-size: 1rem; font-weight: bold; color: var(--text-main);
+      background: transparent; border: none; width: 36px; height: 28px;
+      font-size: 0.9rem; font-weight: bold; color: var(--text-main);
       cursor: pointer; transition: background 0.15s;
     }
     .stepper button:hover { background: #f1f5f9; }
     .stepper span {
-      padding: 0 14px; font-size: 0.85rem; font-weight: 700; color: var(--text-main);
+      padding: 0 12px; font-size: 0.78rem; font-weight: 700; color: var(--text-main);
       border-left: 1px solid #e2e8f0; border-right: 1px solid #e2e8f0;
     }
 
-    /* Pantalla de Carga Inicial */
     #loading-screen {
       position: absolute; inset: 0; background: rgba(15, 23, 42, 0.92);
       backdrop-filter: blur(8px); z-index: 50;
@@ -185,12 +196,12 @@
     }
     #loading-screen.hidden { opacity: 0; pointer-events: none; }
     .loader-spinner {
-      width: 48px; height: 48px; border: 4px solid rgba(255,255,255,0.2);
+      width: 44px; height: 44px; border: 4px solid rgba(255,255,255,0.2);
       border-top-color: var(--accent); border-radius: 50%;
-      animation: spin 0.9s linear infinite; margin-bottom: 16px;
+      animation: spin 0.9s linear infinite; margin-bottom: 14px;
     }
     @keyframes spin { to { transform: rotate(360deg); } }
-    .loader-text { font-size: 0.92rem; font-weight: 600; color: #cbd5e1; }
+    .loader-text { font-size: 0.88rem; font-weight: 600; color: #cbd5e1; }
   </style>
 
   <script type="importmap">
@@ -228,20 +239,25 @@
 
   <div class="bottom-area">
     <div class="info-card" id="info-card">
-      <h2 id="part-title">1. Cabezal y eje principal</h2>
-      <div class="info-row">
-        <strong>Ubicación en la máquina</strong>
-        <span id="part-loc">Extremo izquierdo de la máquina</span>
-      </div>
-      <div class="info-row">
-        <strong>Para qué sirve</strong>
-        <span id="part-func">Sostiene el plato y lo hace girar con la pieza.</span>
-      </div>
-      <div class="card-footer">
-        <div class="warning-text" id="part-warn">
-          <strong>Cuidado preventivo:</strong> Zona de piezas giratorias: no tocar con la máquina en marcha.
-        </div>
+      <div class="card-top-row">
+        <h2 id="part-title">1. Cabezal y eje principal</h2>
         <button class="anim-btn" id="btn-anim">ANIMAR</button>
+      </div>
+
+      <div class="info-capsule">
+        <div class="capsule-icon">📍</div>
+        <div class="capsule-content">
+          <span class="capsule-label">Ubicación en la máquina</span>
+          <span class="capsule-text" id="part-loc">Extremo izquierdo de la máquina</span>
+        </div>
+      </div>
+
+      <div class="info-capsule">
+        <div class="capsule-icon">⚙️</div>
+        <div class="capsule-content">
+          <span class="capsule-label">Para qué sirve</span>
+          <span class="capsule-text" id="part-func">Sostiene el plato y lo hace girar con la pieza.</span>
+        </div>
       </div>
     </div>
 
@@ -258,7 +274,6 @@
   import { OrbitControls } from 'three/addons/controls/OrbitControls.js';
   import { GLTFLoader } from 'three/addons/loaders/GLTFLoader.js';
 
-  // Catálogo con zoom (camPos) y centrado (camTargetOffset) totalmente personalizados por punto
   const PARTS_DATA = [
     {
       id: 1,
@@ -267,9 +282,8 @@
       anchor3D: new THREE.Vector3(-1.15, 1.55, 0.20),
       loc: "Extremo izquierdo de la máquina",
       func: "Sostiene el plato y lo hace girar con la pieza.",
-      warn: "Zona de piezas giratorias: no tocar con la máquina en marcha.",
       animClip: "Operation_Basic",
-      camPos: new THREE.Vector3(-2.2, 2.6, 2.8), // Zoom más alejado para ver completo el punto 1
+      camPos: new THREE.Vector3(-2.2, 2.6, 2.8),
       camTargetOffset: new THREE.Vector3(0, -0.10, 0)
     },
     {
@@ -279,7 +293,6 @@
       anchor3D: new THREE.Vector3(-0.56, 1.43, 0.14),
       loc: "Al frente del cabezal",
       func: "Sujeta la pieza (material base) que se va a trabajar.",
-      warn: "Verificar que la pieza quede bien sujeta antes de encender.",
       animClip: "Idle_Chuck",
       camPos: new THREE.Vector3(-0.45, 1.9, 1.7),
       camTargetOffset: new THREE.Vector3(0, -0.18, 0)
@@ -291,7 +304,6 @@
       anchor3D: new THREE.Vector3(-0.30, 1.06, 0.15),
       loc: "Base larga de la máquina",
       func: "Sobre ella se deslizan los carros y el contrapunto.",
-      warn: "Mantener las guías limpias de viruta y libres de herramientas.",
       animClip: "Carriage_Move",
       camPos: new THREE.Vector3(0.0, 1.9, 2.6),
       camTargetOffset: new THREE.Vector3(0, -0.15, 0)
@@ -303,7 +315,6 @@
       anchor3D: new THREE.Vector3(0.12, 1.22, 0.18),
       loc: "Sobre la bancada, al frente",
       func: "Acerca o aleja la herramienta de la pieza.",
-      warn: "Verificar el espacio libre antes de accionar el avance transversal.",
       animClip: "CrossSlide_Move",
       camPos: new THREE.Vector3(0.38, 1.85, 1.6),
       camTargetOffset: new THREE.Vector3(0, -0.22, 0)
@@ -315,7 +326,6 @@
       anchor3D: new THREE.Vector3(0.12, 1.35, -0.02),
       loc: "Sobre el carro transversal",
       func: "Mueve la cuchilla para dar la forma deseada a la pieza.",
-      warn: "Asegurar firmemente los tornillos de ajuste angular del charriot.",
       animClip: "Operation_Basic",
       camPos: new THREE.Vector3(0.32, 1.9, 1.4),
       camTargetOffset: new THREE.Vector3(0, -0.25, 0)
@@ -327,9 +337,8 @@
       anchor3D: new THREE.Vector3(0.12, 1.21, 0.44),
       loc: "Volante del carro transversal",
       func: "Tornillo que mueve el carro transversal con precisión milimétrica.",
-      warn: "No forzar el volante al llegar a los topes de su recorrido.",
       animClip: "CrossSlide_Move",
-      camPos: new THREE.Vector3(0.38, 1.75, 1.55), // Zoom y posición ajustada para que no quede tan arriba
+      camPos: new THREE.Vector3(0.38, 1.75, 1.55),
       camTargetOffset: new THREE.Vector3(0, -0.18, 0)
     },
     {
@@ -339,9 +348,8 @@
       anchor3D: new THREE.Vector3(0.105, 1.52, 0.0),
       loc: "Sobre el charriot",
       func: "Sostiene la herramienta de corte.",
-      warn: "Retirar la llave antes de encender.",
       animClip: "Operation_Basic",
-      camPos: new THREE.Vector3(0.28, 1.95, 1.35), // Ajustado para bajar la torreta al centro exacto
+      camPos: new THREE.Vector3(0.28, 1.95, 1.35),
       camTargetOffset: new THREE.Vector3(0, -0.25, 0)
     },
     {
@@ -351,7 +359,6 @@
       anchor3D: new THREE.Vector3(0.12, 0.88, 0.45),
       loc: "Bajo el carro principal, al frente",
       func: "Caja con los mandos de avance y roscado. Tiene un dispositivo que impide usar ambos a la vez.",
-      warn: "No intentar engranar avances simultáneos opuestos.",
       animClip: "Carriage_Move",
       camPos: new THREE.Vector3(0.2, 1.4, 1.7),
       camTargetOffset: new THREE.Vector3(0, -0.15, 0)
@@ -363,7 +370,6 @@
       anchor3D: new THREE.Vector3(-0.75, 0.91, 0.36),
       loc: "Debajo del cabezal, a la izquierda",
       func: "Permiten elegir distintos avances y pasos de rosca sin cambiar engranes a cada rato.",
-      warn: "Cambiar velocidades de avance únicamente con la máquina completamente detenida.",
       animClip: "Handwheels_Rotate",
       camPos: new THREE.Vector3(-0.5, 1.45, 1.8),
       camTargetOffset: new THREE.Vector3(0, -0.18, 0)
@@ -375,7 +381,6 @@
       anchor3D: new THREE.Vector3(1.16, 1.42, 0.05),
       loc: "Extremo derecho de la máquina",
       func: "Apoya el otro extremo de piezas largas o pesadas.",
-      warn: "Bloquear firmemente la palanca de sujeción a la bancada antes de iniciar el mecanizado.",
       animClip: "Tailstock_Move",
       camPos: new THREE.Vector3(1.45, 1.8, 1.7),
       camTargetOffset: new THREE.Vector3(0, -0.22, 0)
@@ -473,7 +478,6 @@
     document.getElementById('part-title').textContent = `${part.id}. ${part.name}`;
     document.getElementById('part-loc').textContent = part.loc;
     document.getElementById('part-func').textContent = part.func;
-    document.getElementById('part-warn').innerHTML = `<strong>Cuidado preventivo:</strong> ${part.warn}`;
     document.getElementById('step-counter').textContent = `${part.id} / ${PARTS_DATA.length}`;
 
     pinElements.forEach((item, idx) => {
@@ -639,6 +643,7 @@
     }
   );
 
+  // --- DISTRIBUCIÓN RESPONSIVE OPTIMIZADA PARA MÓVIL (Márgenes y separación de pines) ---
   function updateCallouts() {
     if (!latheRoot || !pinsVisible) return;
     const width = viewport.clientWidth;
@@ -660,12 +665,14 @@
       item.dot.style.left = `${ax}px`;
       item.dot.style.top = `${ay}px`;
 
-      const marginX = 28;
-      const usableW = width - marginX * 2;
+      // Márgenes laterales adaptados para dispositivos móviles (evita que seamontonen en los extremos)
+      const marginX = 16;
+      const usableW = width - (marginX * 2);
       const ratio = idx / Math.max(1, totalPins - 1);
 
-      const px = marginX + ratio * usableW;
-      const py = 110 + (idx % 2) * 26;
+      const px = marginX + (ratio * usableW);
+      // Altura escalonada limpia en la franja superior
+      const py = 112 + (idx % 2) * 25;
 
       item.pin.style.left = `${px}px`;
       item.pin.style.top = `${py}px`;
